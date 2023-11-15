@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+<main class="container py-5">
+    <section class="card card_body">
+        <h1 class="display-1 text-center">Django CRUD Application</h1>
+        <div class="px-2 py-2">
+            <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Dolorum inventore asperiores, illo nostrum quis quasi
+                praesentium, saepe quas obcaecati quidem ipsum ducimus, ullam ex repellendus delectus optio. Aspernatur facilis
+                soluta tempora, quas animi dolorem aliquam dolor, hic corrupti voluptatum iste architecto adipisci, laborum ut
+                nisi doloribus cumque quidem. Impedit officiis, distinctio quidem laboriosam dolorum at consequuntur voluptates
+                iure fuga, tempora non sit dolores modi molestiae eveniet necessitatibus, sequi aperiam nesciunt? Suscipit earum
+                iure, maxime laudantium consequatur consequuntur, omnis dolorum fuga officia illo quos repellendus voluptas
+                voluptate et dolores consectetur alias quis est modi cumque iusto, enim quisquam? Maiores, culpa nostrum!</p>
+        </div>
+            <div class="text-center py-2">
+                {% if not user.is_authenticated %}
+                <a class="btn btn-secondary" href="/signin/">
+                    SignIn
+                </a>
+                <a class="btn btn-dark" href="/signup/">
+                    SignUp
+                </a>
+                {% else %}
+                <a class="btn btn-dark" href="/tasks/">
+                    Tasks list
+                </a>
+                <a class="btn btn-dark" href="/tasks/create/">
+                    Create task
+                </a>
+                <a class="btn btn-dark" href="/logout/">
+                    LogOut
+                </a>
+                {% endif %}
+            </div>
+    </section>
+</main>
+{% endblock %}
