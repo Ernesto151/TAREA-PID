@@ -19,6 +19,43 @@ def home(request):
 
 
 def signup(request):
+    def deny_signup(msg):
+        return render(request, 'signup.html', {
+            'form': UserCreationForm,
+            'error': f'ERROR: {msg}'
+        })
+
+    ALLOWED_CHARACTERS = string.ascii_letters + string.digits + '@.+-_'
+    if request.method == 'GET':
+        return render(request, 'signup.html', {
+            'form': UserCreationForm
+        })
+    else:
+        if len(request.POST['username']) > 150:
+            return deny_signup('Username is too long. Max is 150 characters')
+        elif len(request.POST['username']) < 4:
+            return deny_signup('Username is too short. Min is 4 characters')
+        if not request.POST['username'][0].islower():
+            return deny_signup('Username must start with a lowercase letter')
+        for c in request.POST['username']:
+            if not c in ALLOWED_CHARACTERS:
+                return deny_signup(f'Username contains a not allowed character ({c}). Only Letters, digits and @.+-_ is allowed')
+        if request.POST['password1'] != request.POST['password2']:
+            return deny_signup('Passwords do not match')
+        elif len(request.POST['password1']) < 8:
+            return deny_signup('Password lenght must be at least 8 characters')
+        elif request.POST['password1'] == request.POST['password2']:
+            # Register user
+            print(f'Username: {request.POST['username']}')
+            try:
+                print(f'Password: {request.POST['username']}')
+                user = User.objects.create_user(
+                    username=request.POST['username'], password=request.POST['password1'])
+                user.save()
+                login(request, user)
+                return redirect('tasks')
+            except IntegrityError:
+                return deny_signup('Username already exists. Please try with another')
     ALLOWED_CHARACTERS = string.ascii_letters + string.digits + '@.+-_'
     if request.method == 'GET':
         return render(request, 'signup.html', {
@@ -61,6 +98,24 @@ def signup(request):
                     'form': UserCreationForm,
                     'error': 'CANCELLED: Username already exists. Plase try with another'
                 })
+
+
+def signin(request):
+    if request.method == 'GET':
+        return render(request, 'signin.html', {
+            'form': AuthenticationForm
+        })
+    else:
+        user = authenticate(
+            request, username=request.POST['username'], password=request.POST['password'])
+        if user is None:
+            return render(request, 'signin.html', {
+                'form': AuthenticationForm,
+                'error': 'DENIED: Username or Password is incorrect'
+            })
+        else:
+            login(request, user)
+            return redirect('tasks')
 
 
 @login_required
@@ -136,21 +191,3 @@ def delete_task(request, task_id):
 def signout(request):
     logout(request)
     return redirect('home')
-
-
-def signin(request):
-    if request.method == 'GET':
-        return render(request, 'signin.html', {
-            'form': AuthenticationForm
-        })
-    else:
-        user = authenticate(
-            request, username=request.POST['username'], password=request.POST['password'])
-        if user is None:
-            return render(request, 'signin.html', {
-                'form': AuthenticationForm,
-                'error': 'DENIED: Username or Password is incorrect'
-            })
-        else:
-            login(request, user)
-            return redirect('tasks')
