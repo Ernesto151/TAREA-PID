@@ -56,49 +56,6 @@ def signup(request):
                 return redirect('tasks')
             except IntegrityError:
                 return deny_signup('Username already exists. Please try with another')
-    ALLOWED_CHARACTERS = string.ascii_letters + string.digits + '@.+-_'
-    if request.method == 'GET':
-        return render(request, 'signup.html', {
-            'form': UserCreationForm
-        })
-    else:
-        if len(request.POST['username']) > 150:
-            return render(request, 'signup.html', {
-                'form': UserCreationForm,
-                'error': 'CANCELLED: Username is too long. Max is 150 characters'
-            })
-        for c in request.POST['username']:
-            if not c in ALLOWED_CHARACTERS:
-                return render(request, 'signup.html', {
-                    'form': UserCreationForm,
-                    'error': 'CANCELLED: Username contains a not allowed character. Only Letters, digits and @.+-_ is allowed'
-                })
-        if request.POST['password1'] != request.POST['password2']:
-            return render(request, 'signup.html', {
-                'form': UserCreationForm,
-                'error': 'CANCELLED: Passwords do not match'
-            })
-        elif len(request.POST['password1']) < 8:
-            return render(request, 'signup.html', {
-                'form': UserCreationForm,
-                'error': 'CANCELLED: Password lenght must be at least 8 characters'
-            })
-        elif request.POST['password1'] == request.POST['password2']:
-            # Register user
-            print(f'Username: {request.POST['username']}')
-            try:
-                print(f'Password: {request.POST['username']}')
-                user = User.objects.create_user(
-                    username=request.POST['username'], password=request.POST['password1'])
-                user.save()
-                login(request, user)
-                return redirect('tasks')
-            except IntegrityError:
-                return render(request, 'signup.html', {
-                    'form': UserCreationForm,
-                    'error': 'CANCELLED: Username already exists. Plase try with another'
-                })
-
 
 def signin(request):
     if request.method == 'GET':
